@@ -1,6 +1,6 @@
 # SurvFinder
 
-The source code of article 'An end-to-end synergistic model for personalized neoadjuvant immunochemotherapy decision-making in esophageal cancer'.
+The source code of article 'A Multimodal Synergistic Model for Personalized Neoadjuvant Immunochemotherapy in Esophageal Cancer'.
 
 ## System requirements
 This code was developed and tested in the following settings. 

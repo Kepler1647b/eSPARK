@@ -1,4 +1,4 @@
-# SurvFinder
+# eSPARK
 
 The source code of article 'A Multimodal Synergistic Model for Personalized Neoadjuvant Immunochemotherapy in Esophageal Cancer'.
 

@@ -42,23 +42,23 @@ class DataLoaderX(DataLoader):
         return BackgroundGenerator(super().__iter__())
 
 topkn = 50
-ct_root = "/home/21/zihan/Storage/ESO/ct_feat_radfm/"
-wsi_root = "/data15/data15_5/dexia/eso/celltype_feat"
-hilbert_path = "/data15/data15_5/dexia/eso/ESO/patho_processing/feat_uni_256/"
-label_path = "/data15/data15_5/dexia/eso/"
+ct_root = "/ct_feat_radfm/"
+wsi_root = "/celltype_feat"
+hilbert_path = "/feat/"
+label_path = "/eso/"
 
-preget_omics_feature = "/home/21/zihan/Storage/ESO/code_2409/ct_feat_1125.npy"
+preget_omics_feature = "/ct_feat.npy"
 preget_omics_feature = np.load(preget_omics_feature, allow_pickle=True).tolist()
 
-omics_root = "/home/21/zihan/Storage/ESO/ct_feat_omic"
-omics_dict_path = "/home/21/zihan/Storage/ESO/ctfeat_lasso_1124.npy"
-omics_type_list = ["bw5/tumor"]
-lasso = True
+omics_root = "/ct_feat_omic"
+omics_dict_path = "/ctfeat.npy"
+omics_type_list = ["/tumor"]
+lasso = False
 omics_dict = np.load(omics_dict_path, allow_pickle=True).item()
 
-symptom_root = '/data15/data15_5/dexia/eso/conch_all'
+symptom_root = '/conch_all'
 
-symptoms = ["tumor necrosis", "tumor budding", "immune cells infiltrating the tumor stroma", "well-differentiated tumor cells"]
+symptoms = [""]
 
 
 true_case_list_sysucc, true_rad_list_sysucc = [], []
@@ -138,7 +138,7 @@ class CustomDataset(Dataset):
         # for all omics type, read and concat to form a unified omics data
         omics_data_list = []
         for omics_type in omics_type_list:
-            omics_path = os.path.join(omics_root, omics_type, "ESO-Radiomics-features_{}_ns1024.xlsx".format(dataset_flag))
+            omics_path = os.path.join(omics_root, omics_type, "ESO-Radiomics-features_{}.xlsx".format(dataset_flag))
             # omics_path = os.path.join(omics_root, omics_type, "ESO-Radiomics-features_{}.xlsx".format(dataset_flag))
             omics_df = pd.read_excel(omics_path)
             if lasso:
@@ -297,7 +297,7 @@ model_hyperparameters = {
 }
 gradient_accumulation_steps = model_hyperparameters["gradient_accumulation_steps"]
 # comment = "vaha_wsi_transformer_test_multicenter_topk{}".format(topkn)
-comment = "pure_clam_all_patch_f3test_newrmlist"
+comment = ""
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 seed_everything(model_hyperparameters["seed"])
@@ -342,7 +342,7 @@ for dataset_flag in ["sysucc", "henan", "shantou"]:
 # label ratio
 label_ratio = sysucc_label_df["label"].value_counts().values
 
-fold_file_path = "/data15/data15_5/dexia/eso/train_valid_cases_fold_3.npy"
+fold_file_path = "/fold.npy"
 train_valid_cases = np.load(fold_file_path, allow_pickle=True).item()
 # the file contains the train and valid cases and idx
 # {

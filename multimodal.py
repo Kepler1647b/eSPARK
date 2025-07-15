@@ -41,23 +41,22 @@ class DataLoaderX(DataLoader):
         return BackgroundGenerator(super().__iter__())
 
 topkn = 50
-ct_root = "/home/21/zihan/Storage/ESO/ct_feat_radfm/"
-wsi_root = "/data15/data15_5/dexia/eso/celltype_feat"
-hilbert_path = "/data15/data15_5/dexia/eso/ESO/patho_processing/feat_uni_256/"
-label_path = "/data15/data15_5/dexia/eso/"
+ct_root = "/ct_feat_radfm/"
+wsi_root = "/celltype_feat"
+hilbert_path = "/feat/"
+label_path = "/eso/"
 
-preget_omics_feature = "/home/21/zihan/Storage/ESO/code_2409/dexia_ct_feat_1205.npy"
-preget_omics_feature = np.load(preget_omics_feature, allow_pickle=True).item()
+preget_omics_feature = "/ct_feat.npy"
+preget_omics_feature = np.load(preget_omics_feature, allow_pickle=True).tolist()
 
-omics_root = "/home/21/zihan/Storage/ESO/ct_feat_omic"
-omics_dict_path = "/home/21/zihan/Storage/ESO/ctfeat_lasso_1124.npy"
-omics_type_list = ["bw5/tumor"]
-lasso = True
+omics_root = "/ct_feat_omic"
+omics_dict_path = "/ctfeat.npy"
+omics_type_list = ["/tumor", "/eso"]
+lasso = False
 omics_dict = np.load(omics_dict_path, allow_pickle=True).item()
 
-symptom_root = '/data15/data15_5/dexia/eso/celltype_feat'
-
-symptoms = ["tumor necrosis", "tumor budding", "immune cells infiltrating the tumor stroma", "well-differentiated tumor cells"]
+symptom_root = '/celltype_feat'
+symptoms = [""]
 
 
 true_case_list_sysucc, true_rad_list_sysucc = [], []
@@ -135,7 +134,7 @@ class CustomDataset(Dataset):
         # for all omics type, read and concat to form a unified omics data
         omics_data_list = []
         for omics_type in omics_type_list:
-            omics_path = os.path.join(omics_root, omics_type, "ESO-Radiomics-features_{}_ns1024.xlsx".format(dataset_flag))
+            omics_path = os.path.join(omics_root, omics_type, "ESO-Radiomics-features_{}.xlsx".format(dataset_flag))
             # omics_path = os.path.join(omics_root, omics_type, "ESO-Radiomics-features_{}.xlsx".format(dataset_flag))
             omics_df = pd.read_excel(omics_path)
             if lasso:
@@ -232,15 +231,10 @@ class CustomDataset(Dataset):
 
         # load symptom data
         for case in tqdm(case_list, total=len(case_list), colour="yellow"):
-            # get the data
-            #data_path = os.path.join(symptom_root_, case)
             data_path = os.path.join(symptom_root_)
 
-            #eso_tumor = torch.load(os.path.join(data_path, "squamous cell carcinoma.pt"), map_location=torch.device("cpu"))
             eso_tumor = torch.load(os.path.join(data_path, "%s.pt" % case), map_location=torch.device("cpu"))
 
-            # concat
-            # data = torch.cat((tumor_necrosis, tumor_budding, immune_cells_infiltrating_the_tumor_stroma, well_differentiated_tumor_cells), dim=0)
             data = eso_tumor
             self.data.append(data)
             self.data_case.append(case)
@@ -288,7 +282,7 @@ model_hyperparameters = {
     "gradient_accumulation_steps": 1
 }
 gradient_accumulation_steps = model_hyperparameters["gradient_accumulation_steps"]
-comment = "1205newfoldn10save_initx_multimodal_f4_ensemble_ct01t_fcdsig128_cls128sig128_ep{}_lr{}_ls{}_gradaccu{}".format(model_hyperparameters["num_epochs"], model_hyperparameters["lr"], model_hyperparameters["labelsmoothing"], gradient_accumulation_steps)
+comment = ''
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 seed_everything(model_hyperparameters["seed"])
@@ -331,7 +325,7 @@ for dataset_flag in ["sysucc", "henan", "shantou"]:
 # label ratio
 label_ratio = sysucc_label_df["label"].value_counts().values
 
-fold_file_path = "/data15/data15_5/dexia/eso/train_valid_cases_fold_4.npy"
+fold_file_path = "/train_valid_cases.npy"
 train_valid_cases = np.load(fold_file_path, allow_pickle=True).item()
 # the file contains the train and valid cases and idx
 # {
@@ -479,7 +473,6 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(train_cases_all, train_l
         namelist = []
         iiii = 0
         with torch.no_grad():
-            # for test_loader, test_metrics, test_name in zip(test_loader_list, test_metrics_list, test_name_list):
             for test_loader, test_name in zip(test_loader_list, metric_data_list[1:]):
                 iiii+=1
                 for data, data_omics, label, data_case in tqdm(test_loader, total=len(test_loader), colour="red"):

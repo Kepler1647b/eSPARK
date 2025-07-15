@@ -43,22 +43,22 @@ class DataLoaderX(DataLoader):
         return BackgroundGenerator(super().__iter__())
 
 topkn = 50
-ct_root = "/home/21/zihan/Storage/ESO/ct_feat_radfm/"
-wsi_root = "/data15/data15_5/dexia/eso/celltype_feat"
-hilbert_path = "/data15/data15_5/dexia/eso/ESO/patho_processing/feat_uni_256/"
-label_path = "/data15/data15_5/dexia/eso/"
+ct_root = "/ct_feat_radfm/"
+wsi_root = "/celltype_feat"
+hilbert_path = "/feat/"
+label_path = "/eso/"
 
-preget_omics_feature = "/home/21/zihan/Storage/ESO/code_2409/dexia_ct_feat_1205.npy"
+preget_omics_feature = "/ct_feat.npy"
 preget_omics_feature = np.load(preget_omics_feature, allow_pickle=True).tolist()
 
-omics_root = "/home/21/zihan/Storage/ESO/ct_feat_omic"
-omics_dict_path = "/home/21/zihan/Storage/ESO/ctfeat_lasso_1124.npy"
-omics_type_list = ["bw5/tumor", "bw5/eso"]
+omics_root = "/ct_feat_omic"
+omics_dict_path = "/ctfeat.npy"
+omics_type_list = ["/tumor", "/eso"]
 lasso = False
 omics_dict = np.load(omics_dict_path, allow_pickle=True).item()
 
-symptom_root = '/data15/data15_5/dexia/eso/celltype_feat'
-symptoms = ["tumor necrosis", "tumor budding", "immune cells infiltrating the tumor stroma", "well-differentiated tumor cells"]
+symptom_root = '/celltype_feat'
+symptoms = [""]
 
 
 true_case_list_sysucc, true_rad_list_sysucc = [], []
@@ -138,7 +138,7 @@ class CustomDataset(Dataset):
         # for all omics type, read and concat to form a unified omics data
         omics_data_list = []
         for omics_type in omics_type_list:
-            omics_path = os.path.join(omics_root, omics_type, "ESO-Radiomics-features_{}_ns1024.xlsx".format(dataset_flag))
+            omics_path = os.path.join(omics_root, omics_type, "ESO-Radiomics-features_{}.xlsx".format(dataset_flag))
             # omics_path = os.path.join(omics_root, omics_type, "ESO-Radiomics-features_{}.xlsx".format(dataset_flag))
             omics_df = pd.read_excel(omics_path)
             if lasso:
@@ -244,15 +244,10 @@ class CustomDataset(Dataset):
 
         # load symptom data
         for case in tqdm(case_list, total=len(case_list), colour="yellow"):
-            # get the data
-            #data_path = os.path.join(symptom_root_, case)
             data_path = os.path.join(symptom_root_)
 
-            #eso_tumor = torch.load(os.path.join(data_path, "squamous cell carcinoma.pt"), map_location=torch.device("cpu"))
             eso_tumor = torch.load(os.path.join(data_path, "%s.pt" % case), map_location=torch.device("cpu"))
 
-            # concat
-            # data = torch.cat((tumor_necrosis, tumor_budding, immune_cells_infiltrating_the_tumor_stroma, well_differentiated_tumor_cells), dim=0)
             data = eso_tumor
             self.data.append(data)
             self.data_case.append(case)
@@ -365,7 +360,7 @@ for dataset_flag in ["sysucc", "henan", "shantou"]:
 # label ratio
 label_ratio = sysucc_label_df["label"].value_counts().values
 
-fold_file_path = "/data15/data15_5/dexia/eso/train_valid_cases_fold_4.npy"
+fold_file_path = "/train_valid_cases.npy"
 train_valid_cases = np.load(fold_file_path, allow_pickle=True).item()
 # the file contains the train and valid cases and idx
 # {
@@ -508,7 +503,6 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(train_cases_all, train_l
             str_metrics += "{}: {:.4f}, ".format(metric_name, metrics_dict["train_" + metric_name].compute())
             # metrics_dict["train_" + metric_name].reset()
 
-        # print(f"Epoch: {epoch}, Loss: {train_loss / len(train_loader)}, Accuracy: {train_metrics[0].compute()}, Precision: {train_metrics[1].compute()}, Recall: {train_metrics[2].compute()}, AUC: {train_metrics[3].compute()}")
         print(f"Epoch: {epoch}, Loss: {metrics_dict['train_Loss'].compute()}, {str_metrics}")
 
         model.eval()

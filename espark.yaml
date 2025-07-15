@@ -1,4 +1,4 @@
-name: uni
+name: espark
 channels:
   - defaults
 dependencies:
@@ -257,4 +257,3 @@ dependencies:
     - xxhash==3.5.0
     - yarl==1.11.1
     - zetascale==2.7.3
-prefix: /data15/data15_5/dexia/anaconda3/envs/uni

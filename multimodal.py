@@ -40,22 +40,23 @@ class DataLoaderX(DataLoader):
     def __iter__(self):
         return BackgroundGenerator(super().__iter__())
 
+
 topkn = 50
-ct_root = "/ct_feat_radfm/"
-wsi_root = "/celltype_feat"
-hilbert_path = "/feat/"
-label_path = "/eso/"
+ct_root = "/path/to/ct/"
+wsi_root = "/path/to/wsi/"
+hilbert_path = "/path/to/feat/"
+label_path = "/path/to/label/"
 
 preget_omics_feature = "/ct_feat.npy"
 preget_omics_feature = np.load(preget_omics_feature, allow_pickle=True).tolist()
 
-omics_root = "/ct_feat_omic"
-omics_dict_path = "/ctfeat.npy"
+omics_root = "/path/to/omics/"
+omics_dict_path = "/path/to/omics_dict.npy"
 omics_type_list = ["/tumor", "/eso"]
 lasso = False
 omics_dict = np.load(omics_dict_path, allow_pickle=True).item()
 
-symptom_root = '/celltype_feat'
+symptom_root = "/path/to/symptom/"
 symptoms = [""]
 
 
